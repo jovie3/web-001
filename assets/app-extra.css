@@ -53,9 +53,9 @@
 .ref-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 .tpl.is-on {
-  border-color: var(--red);
-  background: #FFF9F6;
-  box-shadow: 0 0 0 2px #F6D2CD, 0 18px 34px -24px rgba(74, 48, 26, .6);
+  border-color: var(--accent);
+  background: #F7F8FE;
+  box-shadow: 0 0 0 2px var(--accent-line), var(--shadow-soft);
 }
 
 .tpl-toast {
@@ -70,9 +70,9 @@
   gap: 12px;
   padding: 10px 14px;
   border-radius: 12px;
-  border: 1px solid var(--red-line);
-  background: #FFF7F5;
-  color: var(--red);
+  border: 1px solid var(--accent-line);
+  background: var(--accent-soft);
+  color: var(--accent);
   font-size: 13.5px;
   box-shadow: var(--shadow-soft);
 }
@@ -84,7 +84,7 @@
   padding: 4px 6px;
   border-radius: 8px;
 }
-.tpl-toast button:hover { color: var(--red); background: #FDEDEA; }
+.tpl-toast button:hover { color: var(--accent); background: var(--accent-soft); }
 
 .rw-win-bar {
   max-width: 796px;
@@ -103,9 +103,9 @@
   cursor: pointer;
 }
 .rw-win-tab.is-on {
-  border-color: var(--red-line);
-  color: var(--red);
-  background: var(--red-soft);
+  border-color: var(--accent-line);
+  color: var(--accent);
+  background: var(--accent-soft);
   font-weight: 600;
 }
 .rw-win-tab button {
@@ -149,7 +149,7 @@
   cursor: pointer;
 }
 .side-item:hover { background: #fff; border-color: var(--line); }
-.side-item.is-on { background: #fff; border-color: var(--red-line); }
+.side-item.is-on { background: #fff; border-color: var(--accent-line); }
 .side-item b { display: block; font-size: 12.5px; font-weight: 600; color: var(--ink); }
 .side-item span { display: block; margin-top: 3px; font-size: 11.5px; color: var(--ink-3); }
 .side-item .st { margin-top: 6px; }
@@ -159,10 +159,10 @@
   padding: 14px 14px 8px;
   border: 1px dashed var(--line-strong);
   border-radius: 14px;
-  background: #FDFAF6;
+  background: var(--bg-soft);
 }
 
-.shot.is-picked { outline: 2px solid var(--red); outline-offset: 2px; border-radius: 16px; }
+.shot.is-picked { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 16px; }
 .shot img.shot-img { width: 100%; height: 100%; object-fit: cover; display: block; }
 #ss-shots { display: grid; gap: 14px; }
 #ss-shots .shot { max-width: 430px; }
