@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 内容工作台 · 小红书创作用具</title>
+<meta name="description" content="小红书 AI 改写、AI 生图、发布列表、视频文案提取与商品采集。本地运行，密钥只留在本机。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23DE2B24'/%3E%3Cpath d='M16 6.5l2.4 6.6 7 .2-5.5 4.3 1.9 6.7-5.8-4-5.8 4 1.9-6.7L6.6 13.3l7-.2z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/app-extra.css">
+</head>
+<body>
+
+<!-- ============================================================
+     页面状态（radio）：无 JavaScript，靠 label + :checked 切页
+     ============================================================ -->
+<input class="tab-radio" type="radio" name="app-tab" id="tab-home" checked>
+<input class="tab-radio" type="radio" name="app-tab" id="tab-image">
+<input class="tab-radio" type="radio" name="app-tab" id="tab-publish">
+<input class="tab-radio" type="radio" name="app-tab" id="tab-extract">
+<input class="tab-radio" type="radio" name="app-tab" id="tab-product">
+<input class="tab-radio" type="radio" name="app-tab" id="tab-settings">
+
+<!-- ============================================================
+     顶部通栏
+     ============================================================ -->
+<header class="site-head">
+  <div class="head-inner">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M12 3.2l2 5.5 5.6.2-4.4 3.4 1.5 5.4-4.7-3.2-4.7 3.2 1.5-5.4L4.4 8.9l5.6-.2z"/></svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">AI 内容工作台</span>
+        <span class="brand-tag">小红书创作用具</span>
+      </div>
+    </div>
+
+    <nav class="nav" aria-label="功能导航">
+      <label class="nav-label" for="tab-home">小红书 AI 改写</label>
+      <label class="nav-label" for="tab-image">AI 生图</label>
+      <label class="nav-label" for="tab-publish">发布列表</label>
+      <label class="nav-label" for="tab-extract">提取视频文案</label>
+      <label class="nav-label" for="tab-product">商品采集</label>
+    </nav>
+
+    <div class="head-tools">
+      <label class="tool-btn" for="tab-settings">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 14.6a1.7 1.7 0 0 0 .34 1.88l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 8.9 19.3a1.7 1.7 0 0 0-1.88.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.88A1.7 1.7 0 0 0 3 16.8H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.56-1.03 1.7 1.7 0 0 0-.34-1.88l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.88.34A1.7 1.7 0 0 0 8.9 3.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.88-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.88V8.1a1.7 1.7 0 0 0 1.56 1.03H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1.47z"/></svg>
+        <span>设置</span>
+      </label>
+    </div>
+  </div>
+</header>
+
+<main class="shell">
+
+<!-- ============================================================
+     视图 1：小红书 AI 改写（首页）
+     ============================================================ -->
+<section class="view view-home" aria-label="小红书 AI 改写">
+
+  <div class="hero">
+    <span class="eyebrow"><i class="dot"></i>小红书 · AI 内容工作台</span>
+    <h1 class="hero-title">让 AI 先写一版，<br>你再改到满意</h1>
+    <p class="hero-sub">认得出你给的参考 · 一次给出标题、正文和话题标签 · 复制就能发</p>
+  </div>
+
+  <div class="card rewrite">
+
+    <!-- 三个入口选项卡 -->
+    <input class="tab-radio" type="radio" name="rw-mode" id="rw-link" checked>
+    <input class="tab-radio" type="radio" name="rw-mode" id="rw-img">
+    <input class="tab-radio" type="radio" name="rw-mode" id="rw-goods">
+
+    <div class="rw-tabs" role="tablist" aria-label="改写入口">
+      <label class="rw-tab" for="rw-link">小红书链接</label>
+      <label class="rw-tab" for="rw-img">上传图片 <span class="rw-badge solid">新上线</span></label>
+      <label class="rw-tab" for="rw-goods">商品笔记 <span class="rw-badge line">选品数据</span></label>
+    </div>
+
+    <div class="rw-body">
+
+      <!-- 入口 1：链接 -->
+      <div class="rw-panel rw-panel-link">
+        <textarea id="rw-link-input" class="field field-lg" placeholder="改写只支持小红书链接：标准链接、xhslink.com / xhslink.cn 短链、App 里复制的那段分享文字都能认出来。抖音 / B站 / 微博链接请到「提取视频文案」页处理。"></textarea>
+        <p class="field-error" id="rw-link-error" hidden>链接格式不对，请粘贴小红书笔记链接</p>
+
+        <div class="form-foot">
+          <p class="hint">可以一次贴多条，排队改写；最多同时开 10 个改写窗口，互不影响。</p>
+          <button id="rw-link-submit" class="btn btn-primary btn-lg" type="button"><span class="star">✦</span>一键 AI 改写</button>
+        </div>
+
+        <details class="fold">
+          <summary class="fold-head">
+            <svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+            没有链接？直接把原文贴进来
+          </summary>
+          <div class="fold-body">
+            <textarea id="rw-plain-input" class="field" placeholder="把笔记正文原样粘贴进来。AI 会顺着你原本的语气重写，不会把你说话的习惯改掉。"></textarea>
+          </div>
+        </details>
+      </div>
+
+      <!-- 入口 2：上传图片 -->
+      <div class="rw-panel rw-panel-img">
+        <div class="upload" id="rw-img-upload" role="button" tabindex="0">
+          <div class="upload-icon"><svg viewBox="0 0 24 24"><path d="M12 16V4m0 0l-4 4m4-4l4 4"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg></div>
+          <div class="upload-main">点击上传图片，最多 9 张</div>
+          <p class="upload-sub">JPG / PNG / WEBP，单张 10MB 以内。只读取画面里的信息，图片本身不会参与改写。</p>
+          <input id="rw-img-file" class="file-input" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" multiple>
+        </div>
+        <div class="upload-list" id="rw-img-list"></div>
+        <p class="field-error" id="rw-img-error" hidden></p>
+
+        <div class="field-row">
+          <div class="field-label">商品名称 <span class="req">*</span></div>
+          <input id="rw-img-name" class="field field-one" type="text" placeholder="填商品全名，例如：某某牌 氨基酸洁面 120g">
+          <p class="field-error" id="rw-img-name-error" hidden>请填写商品名称</p>
+        </div>
+
+        <div class="field-row">
+          <div class="field-label">链接 <span class="opt">可选</span></div>
+          <input id="rw-img-url" class="field field-one" type="text" placeholder="小红书笔记链接、店铺商品链接都行">
+          <p class="field-note">链接只用来核对商品信息，不参与改写。</p>
+        </div>
+
+        <div class="form-foot">
+          <p class="hint">上传 1 张就能改；批量改写一次最多 10 张。</p>
+          <button id="rw-img-submit" class="btn btn-primary btn-lg" type="button"><span class="star">✦</span>一键 AI 改写商品笔记</button>
+        </div>
+      </div>
+
+      <!-- 入口 3：商品笔记 -->
+      <div class="rw-panel rw-panel-goods">
+        <div class="upload" id="rw-goods-upload" role="button" tabindex="0">
+          <div class="upload-icon"><svg viewBox="0 0 24 24"><path d="M12 16V4m0 0l-4 4m4-4l4 4"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg></div>
+          <div class="upload-main">点击上传图片，最多 9 张</div>
+          <p class="upload-sub">JPG / PNG / WEBP，单张 10MB 以内。只读取画面里的信息，图片本身不会参与改写。</p>
+          <input id="rw-goods-file" class="file-input" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" multiple>
+        </div>
+        <div class="upload-list" id="rw-goods-list"></div>
+        <p class="field-error" id="rw-goods-error" hidden></p>
+
+        <div class="field-row">
+          <div class="field-label">商品名称 <span class="req">*</span></div>
+          <input id="rw-goods-name" class="field field-one" type="text" placeholder="填商品全名，例如：某某牌 保温杯 500ml">
+          <p class="field-error" id="rw-goods-name-error" hidden>请填写商品名称</p>
+        </div>
+
+        <div class="field-row">
+          <div class="field-label">链接 <span class="opt">可选</span></div>
+          <input id="rw-goods-url" class="field field-one" type="text" placeholder="小红书笔记链接、店铺商品链接都行">
+          <p class="field-note">链接只用来核对商品信息，不参与改写。</p>
+        </div>
+
+        <div class="form-foot">
+          <p class="hint">商品笔记：把商品名称、图片和链接三路信息对齐，产出一篇能直接发布的带货笔记。</p>
+          <button id="rw-goods-submit" class="btn btn-primary btn-lg" type="button"><span class="star">✦</span>一键 AI 改写商品笔记</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <p class="field-error" id="rw-fetch-hint" hidden></p>
+  <div class="rw-win-bar is-hidden" id="rw-win-bar"></div>
+  <!-- 改写结果：独立改写窗口（由脚本填入，初始不展示占位稿） -->
+  <section class="card result is-hidden" id="rw-result" aria-label="改写结果">
+    <div class="result-head">
+      <div class="result-title">
+        改写结果
+        <span class="chip grey" id="rw-status-chip"><i class="d"></i>草稿 · 未保存</span>
+      </div>
+      <span class="result-meta" id="rw-result-meta">独立改写窗口 #1 · 共 1 个</span>
+    </div>
+    <div class="result-body">
+      <div class="block">
+        <div class="block-head">
+          <span class="block-name">标题</span>
+          <span class="block-count" id="rw-title-count">0 字</span>
+        </div>
+        <textarea id="rw-title" class="title-field" rows="1" aria-label="笔记标题"></textarea>
+      </div>
+      <div class="block">
+        <div class="block-head">
+          <span class="block-name">正文</span>
+          <span class="block-count" id="rw-body-count">可直接编辑</span>
+        </div>
+        <textarea id="rw-body" class="body-field" aria-label="笔记正文"></textarea>
+      </div>
+      <div class="block">
+        <div class="block-head">
+          <span class="block-name">话题标签</span>
+          <span class="block-count" id="rw-tag-count">0 个</span>
+        </div>
+        <div class="tags" id="rw-tags">
+          <span class="tag-add" id="rw-tag-add">＋ 添加标签</span>
+        </div>
+      </div>
+    </div>
+    <div class="result-actions">
+      <button id="rw-regen" class="btn btn-ghost" type="button">重新生成</button>
+      <button id="rw-copy-title" class="btn btn-ghost btn-sm" type="button">复制标题</button>
+      <button id="rw-copy-body" class="btn btn-ghost btn-sm" type="button">复制正文</button>
+      <button id="rw-copy-tags" class="btn btn-ghost btn-sm" type="button">复制标签</button>
+      <span class="spacer"></span>
+      <button id="rw-save" class="btn btn-primary" type="button">保存到发布列表</button>
+    </div>
+  </section>
+
+</section>
+
+<!-- ============================================================
+     视图 2：AI 生图
+     ============================================================ -->
+<section class="view view-image" aria-label="AI 生图">
+
+  <div class="page-head">
+    <h1>一句话，先出张图看看</h1>
+    <p>描述得越具体，成图越接近你脑子里的那一张；拿不准的时候，先把参考图递过去。</p>
+  </div>
+
+  <div class="card gen-card">
+    <textarea id="gen-prompt" class="field gen-area" placeholder="例：木桌上放着一杯抹茶拿铁，旁边摊着一本翻开的书，午后的斜光从右边照进来，杯壁留着一圈水珠。"></textarea>
+
+    <div class="gen-controls">
+      <div class="ctrl">
+        <span class="ctrl-label">生成张数</span>
+        <div class="seg">
+          <button class="seg-btn is-on" type="button" data-count="1">1</button>
+          <button class="seg-btn" type="button" data-count="2">2</button>
+          <button class="seg-btn" type="button" data-count="4">4</button>
+        </div>
+      </div>
+
+      <div class="ctrl">
+        <span class="ctrl-label">比例</span>
+        <div class="select-wrap">
+          <select id="gen-ratio" class="ctrl-select" aria-label="图片比例">
+            <option selected>3:4</option>
+            <option>1:1</option>
+            <option>4:3</option>
+            <option>16:9</option>
+            <option>9:16</option>
+          </select>
+          <svg class="caret" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+      </div>
+
+      <div class="ctrl">
+        <span class="ctrl-label">分辨率</span>
+        <div class="select-wrap">
+          <select id="gen-res" class="ctrl-select" aria-label="输出分辨率">
+            <option selected>1K</option>
+            <option>2K</option>
+            <option>4K</option>
+          </select>
+          <svg class="caret" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+      </div>
+
+      <button id="gen-ref-btn" class="icon-btn" type="button">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="1.7"/><path d="M4.5 18l5-5 4 4 3-3 3.5 3.5"/></svg>
+        参考图
+      </button>
+      <input id="gen-ref-file" class="file-input" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp">
+
+      <span class="ctrl-spacer"></span>
+
+      <button id="gen-optimize" class="btn btn-ghost is-disabled" type="button" disabled><span class="star">✦</span>优化提示词</button>
+      <button id="gen-submit" class="btn btn-primary btn-lg is-disabled" type="button" disabled>生成图片 →</button>
+    </div>
+
+    <p class="field-error" id="gen-error" hidden></p>
+    <div class="ref-area is-hidden" id="gen-ref-area">
+      <div class="ref-thumb" id="gen-ref-thumb" aria-hidden="true"></div>
+      <div class="ref-text">
+        <span class="ref-name">已添加参考图</span>
+        <div class="ref-links">
+          <button id="gen-ref-view" type="button">查看参考图大图</button>
+        </div>
+      </div>
+      <button id="gen-ref-del" class="ref-links ref-del" type="button" aria-label="移除参考图">移除参考图 ×</button>
+    </div>
+
+    <div class="state-row is-hidden" aria-hidden="true"></div>
+  </div>
+
+  <div class="tpl-toast is-hidden" id="tpl-toast" role="status">
+    <span id="tpl-toast-text"></span>
+    <button id="tpl-toast-close" type="button">关闭提示</button>
+  </div>
+  <section class="tpl-block" aria-label="风格模板">
+    <div class="tpl-head">
+      <div>
+        <h2>风格模板</h2>
+        <p>点一下卡片，模板的描述就填进上面的输入框；想改，直接在描述里加词。</p>
+      </div>
+      <button id="tpl-sort" class="sort-btn" type="button">
+        <svg viewBox="0 0 24 24"><path d="M7 4v16m0 0l-3-3m3 3l3-3M17 20V4m0 0l-3 3m3-3l3 3"/></svg>
+        排序
+      </button>
+    </div>
+
+    <div class="tpl-grid" id="tpl-grid">
+
+      <button class="tpl" type="button" data-tpl-id="ppt">
+        <div class="tpl-thumb tpl-1">
+          <span class="big">PPT</span>
+          <span class="small">层级 / 图标 / 留白</span>
+        </div>
+        <div class="tpl-name">PPT 美化设计</div>
+      </button>
+
+      <button class="tpl" type="button" data-tpl-id="notes">
+        <div class="tpl-thumb tpl-2">
+          <span class="big">考点 03</span>
+          <span class="small">第三单元 · 必背 12 条</span>
+        </div>
+        <div class="tpl-name">手写笔记考点卡片</div>
+      </button>
+
+      <button class="tpl" type="button" data-tpl-id="mood">
+        <div class="tpl-thumb tpl-3">
+          <span class="big">今天也要<br>好好吃饭</span>
+          <span class="small">大字 · 纯色 · 居中</span>
+        </div>
+        <div class="tpl-name">纯色底大字情绪卡</div>
+      </button>
+
+      <button class="tpl" type="button" data-tpl-id="exam">
+        <div class="tpl-thumb tpl-4">
+          <span class="big">语文 · 期末</span>
+          <span class="small">手写体 · 封面留白</span>
+        </div>
+        <div class="tpl-name">手写字考试封面设计</div>
+      </button>
+
+      <button class="tpl" type="button" data-tpl-id="ghibli">
+        <div class="tpl-thumb tpl-5">
+          <span class="big">改造前后对比</span>
+          <span class="small">柔光 · 草地 · 暖色</span>
+        </div>
+        <div class="tpl-name">吉卜力美学对比图</div>
+      </button>
+
+      <button class="tpl" type="button" data-tpl-id="hotpot">
+        <div class="tpl-thumb tpl-6">
+          <span class="big">锅</span>
+          <span class="small">场景替换 · 避免撞图</span>
+        </div>
+        <div class="tpl-name">火锅店场景替换去重</div>
+      </button>
+
+      <button class="tpl" type="button" data-tpl-id="model">
+        <div class="tpl-thumb tpl-7">
+          <span class="big">上身效果</span>
+          <span class="small">自然光 · 街角 · 3:4</span>
+        </div>
+        <div class="tpl-name">真实模特衣服穿搭</div>
+      </button>
+
+      <button class="tpl" type="button" data-tpl-id="ink">
+        <div class="tpl-thumb tpl-8">
+          <span class="big">山水</span>
+          <span class="small">墨色 · 留白 · 产品居中</span>
+        </div>
+        <div class="tpl-name">水墨山水商业产品海报</div>
+      </button>
+
+      <button id="tpl-new" class="tpl tpl-new" type="button">
+        <span class="plus" aria-hidden="true">＋</span>
+        <span class="lbl">新建模板</span>
+        <span class="sub">存一套自己的描述</span>
+      </button>
+
+    </div>
+  </section>
+  <section class="session is-hidden" id="gen-session" aria-label="生图结果">
+    <div class="card session-side">
+      <h3 class="side-title">会话详情</h3>
+      <dl class="kv" id="session-kv">
+        <dt>描述</dt>
+        <dd id="ss-prompt">—</dd>
+        <dt>会话 ID</dt>
+        <dd class="mono" id="ss-id">—</dd>
+        <dt>数量</dt>
+        <dd id="ss-count">—</dd>
+        <dt>比例</dt>
+        <dd id="ss-ratio">—</dd>
+        <dt>分辨率</dt>
+        <dd id="ss-res">—</dd>
+        <dt>状态</dt>
+        <dd class="figure" id="ss-status">等待生成</dd>
+        <dt>完成 / 总数</dt>
+        <dd id="ss-progress">0 / 0</dd>
+        <dt>创建时间</dt>
+        <dd id="ss-time">—</dd>
+        <dt>积分消耗</dt>
+        <dd class="figure" id="ss-credit">本地模式，无积分消耗</dd>
+      </dl>
+      <p class="side-foot" id="ss-foot">本地模式，无积分消耗。同一个会话的图一起归档；换个描述，就是一次新会话。</p>
+    </div>
+
+    <div class="card session-main">
+      <div class="sec-head">
+        <h3>结果图库</h3>
+        <span class="note" id="ss-gallery-note">尚未生成</span>
+      </div>
+
+      <div class="shot-wrap" id="ss-gallery">
+        <div id="ss-shots"></div>
+        <div class="shot-actions" id="ss-actions">
+          <button id="ss-view" class="btn btn-ghost btn-sm" type="button">查看大图</button>
+          <button id="ss-regen" class="btn btn-ghost btn-sm" type="button">重新生成同款</button>
+          <button id="ss-unbase" class="btn btn-quiet" type="button">取消当前基准</button>
+          <div class="row2">
+            <button id="ss-download" class="btn btn-primary btn-sm" type="button">下载图片</button>
+            <button id="ss-select" class="btn btn-ghost btn-sm" type="button">选择图片</button>
+            <div class="select-wrap">
+              <select id="ss-pick" class="ctrl-select" aria-label="选择要操作的图片">
+                <option value="0" selected>第 1 张</option>
+              </select>
+              <svg class="caret" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</section>
+
+<!-- ============================================================
+     视图 3：发布列表
+     ============================================================ -->
+<section class="view view-publish" aria-label="发布列表">
+
+  <div class="page-head pub-head">
+    <div>
+      <h1>发布列表</h1>
+      <p>改写完顺手存一条，什么时候发、发到哪，都在这里排队。</p>
+    </div>
+    <label class="btn btn-primary" for="tab-home" id="pub-new">新建</label>
+  </div>
+
+  <div class="workspace">
+
+    <aside class="card rail" aria-label="筛选与操作">
+      <div class="filters" id="pub-filters">
+        <button class="filter-btn is-on" type="button" data-filter="all">全部 <span class="count">0</span></button>
+        <button class="filter-btn" type="button" data-filter="pending">待生成 <span class="count">0</span></button>
+        <button class="filter-btn" type="button" data-filter="generating">生成中 <span class="count">0</span></button>
+        <button class="filter-btn" type="button" data-filter="draft">生成完成 <span class="count">0</span></button>
+        <button class="filter-btn" type="button" data-filter="copied">已同步飞书 <span class="count">0</span></button>
+        <button class="filter-btn" type="button" data-filter="published">已生成二维码 <span class="count">0</span></button>
+        <button class="filter-btn" type="button" data-filter="failed">失败 <span class="count">0</span></button>
+      </div>
+
+      <div class="rail-sep"></div>
+
+      <label class="search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+        <input id="pub-search" type="search" placeholder="搜索标题或账号">
+      </label>
+
+      <div class="rail-actions">
+        <button id="pub-batch" class="btn btn-ghost btn-sm" type="button">批量选择</button>
+        <button id="pub-batch-del" class="btn btn-quiet btn-sm is-hidden" type="button">删除所选</button>
+      </div>
+
+      <div class="rail-sort">
+        <span>排序</span>
+        <div class="select-wrap">
+          <select id="pub-sort" class="ctrl-select" aria-label="排序方式">
+            <option selected>最近创建</option>
+            <option>最近更新</option>
+            <option>标题首字</option>
+          </select>
+          <svg class="caret" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+      </div>
+    </aside>
+
+    <div class="list-main" id="pub-main">
+      <div id="pub-list"></div>
+
+
+      <div class="card empty" id="pub-empty">
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24"><path d="M14 4H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9z"/><path d="M14 4v5h5"/><path d="M9 14h6M9 17h4"/></svg>
+        </div>
+        <p class="empty-title">这里还没有保存的笔记</p>
+        <p class="empty-text">在改写结果里点「保存到发布列表」，笔记就会落到这儿，可以接着改、直接发，或者同步进飞书。</p>
+        <label class="empty-cta" for="tab-home">去改写 →</label>
+      </div>
+
+      <div class="card is-hidden" id="pub-sample" data-sample="1">
+        <div class="sample-head">
+          <h3>有记录的时候，列表长这样</h3>
+          <span class="note">示例数据 · 仅用于看版式 · 不会当作真实记录</span>
+        </div>
+        <div class="record">
+          <div>
+            <div class="rec-title">在出租屋也能冲出好喝的抹茶拿铁，我试了七次</div>
+            <div class="rec-sub">22 字 · 4 个标签 · 来自「小红书链接」改写</div>
+          </div>
+          <div class="rec-time">11-10 14:26</div>
+          <div><span class="chip"><i class="d"></i>已同步飞书</span></div>
+          <div class="rec-source"><span class="chip grey">小红书链接</span></div>
+          <div class="rec-actions">
+            <button class="btn btn-ghost btn-sm" type="button">查看</button>
+            <button class="btn btn-ghost btn-sm" type="button">复制</button>
+            <button class="btn btn-quiet btn-sm" type="button">删除</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     视图 4：提取视频文案
+     ============================================================ -->
+<section class="view view-extract" aria-label="提取视频文案">
+
+  <div class="split">
+
+    <aside class="side" aria-label="提取记录">
+      <div class="side-head">
+        <h2>视频文案</h2>
+        <p>异步提取记录</p>
+      </div>
+      <button id="ex-new" class="btn btn-primary btn-sm" type="button">＋ 新建提取</button>
+
+      <div class="side-group-head"><span>最近提取</span><span id="ex-count">0</span></div>
+      <div id="ex-records"></div>
+      <div class="side-empty" id="ex-empty">
+        <b>暂无记录</b>
+        <span>在插件里点「提取文案」，或在右边直接贴链接。</span>
+      </div>
+
+      <p class="side-note">每条链接单独排队，先提交先出结果；中途关掉页面也不影响。</p>
+    </aside>
+
+    <div class="list-main">
+
+      <div class="card form-card">
+        <h1>把视频里的口播，整理成能直接用的文案</h1>
+        <p class="lead">贴抖音 / 小红书 / B站 / 微博的分享文本或链接，自动识别平台、展开短链，顺着口播往下切段、顺句，整理成能拿去复用的精修稿。改写功能仍只支持小红书链接。</p>
+
+        <hr>
+
+        <div style="margin-top:20px">
+          <div class="label-row">
+            <span class="name">视频笔记链接</span>
+            <span class="label-badge">每行一条 · 异步提取</span>
+          </div>
+          <textarea id="ex-links" class="field" style="min-height:152px" placeholder="每行贴一条，可整段粘贴 App 分享文本（自动抠出链接）：&#10;https://v.douyin.com/MpoWDnNTPWM/&#10;https://xhslink.cn/o/gQcrqnoFY9&#10;https://b23.tv/BV1GJ411x7h7&#10;https://t.cn/A6m7k9Qp"></textarea>
+          <p class="field-error" id="ex-error" hidden></p>
+
+          <div class="form-foot">
+            <p class="hint">一次贴多少条都行，按提交顺序排队；结果会落到左侧的提取记录里。</p>
+            <button id="ex-submit" class="btn btn-primary btn-lg" type="button">提取文案</button>
+          </div>
+
+          <div class="tip" id="ex-cookie-tip">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+            <span id="ex-cookie-text">未配置 小红书 / 抖音 / 微博 Cookie：对应平台链接不会发起请求；B站链接不需要 Cookie，可直接解析。可改用上传视频/音频文件转写。</span>
+          </div>
+
+          <div class="upload-entry">
+            <div class="row">
+              <div class="txt">
+                <b>没有链接？上传视频 / 音频文件转写</b>
+                <span>mp4 / mov / m4a / mp3，单个文件 500MB 以内，同样走异步队列。</span>
+              </div>
+              <button id="ex-file-btn" class="btn btn-ghost btn-sm" type="button">选择文件</button>
+              <input id="ex-file" class="file-input" type="file" accept="video/*,audio/*,.mp4,.mov,.m4a,.mp3,.wav,.webm,.aac">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card form-card is-hidden" id="ex-result">
+        <div class="sec-head">
+          <h3>提取结果</h3>
+          <span class="note" id="ex-result-note"></span>
+        </div>
+        <div class="segments" id="ex-segments"></div>
+        <div class="result-actions" style="margin-top:16px;padding-left:0;padding-right:0;padding-bottom:0">
+          <button id="ex-copy-all" class="btn btn-ghost btn-sm" type="button">复制全文</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     视图 5：商品采集
+     ============================================================ -->
+<section class="view view-product" aria-label="商品采集">
+
+  <div class="split">
+
+    <aside class="side" aria-label="采集记录">
+      <div class="side-head">
+        <h2>商品采集</h2>
+        <p>记录保留 30 天</p>
+      </div>
+      <button id="pd-new" class="btn btn-primary btn-sm" type="button">＋ 新建采集</button>
+
+      <div class="side-group-head"><span>最近记录</span><span id="pd-count">0</span></div>
+      <div id="pd-records"></div>
+      <div class="side-empty" id="pd-empty">
+        <b>暂无采集记录</b>
+        <span>输入关键词跑一次，结果会在这里留 30 天。</span>
+      </div>
+
+      <p class="side-note">到期自动清理，需要长期留存的表，跑完记得先下载。</p>
+    </aside>
+
+    <div class="list-main">
+
+      <div class="card form-card">
+        <h1>把关键词跑成一张能用的商品表</h1>
+        <p class="lead">按关键词搜出商品，补齐价格、销量、店铺粉丝和累计销量，核对完直接导出 Excel。</p>
+
+        <hr>
+
+        <div style="margin-top:20px">
+          <div class="label-row">
+            <span class="name">新建商品采集</span>
+            <span class="label-badge" id="pd-badge">预计采集 100 条</span>
+          </div>
+
+          <div class="two-col">
+            <div>
+              <div class="field-label">关键词</div>
+              <input id="pd-keyword" class="field field-one" type="text" placeholder="防晒霜、教辅资料、露营灯">
+            </div>
+            <div>
+              <div class="field-label">采集数量</div>
+              <input id="pd-qty" class="field field-one" type="number" value="100" min="1" max="300" aria-label="采集数量">
+            </div>
+          </div>
+
+          <div class="quick-row" style="align-items:center">
+            <span class="ctrl-label">采集规模</span>
+            <button class="quick-btn" type="button" data-qty="20">20</button>
+            <button class="quick-btn is-on" type="button" data-qty="100">100</button>
+            <button class="quick-btn" type="button" data-qty="300">300</button>
+          </div>
+
+          <div class="form-foot">
+            <p class="hint">多个关键词用逗号隔开即可；数量越大耗时越长，建议先跑 20 条看看链路。</p>
+            <button id="pd-submit" class="btn btn-primary btn-lg is-disabled" type="button" disabled>开始采集</button>
+          </div>
+
+          <div class="import-box" id="pd-import-box">
+            <div class="field-label">没有可用的免费商品搜索接口时，请粘贴商品链接或导入表格，补全后导出 Excel</div>
+            <textarea id="pd-paste" class="field" style="min-height:110px;margin-top:8px" placeholder="每行一条商品。可只贴链接，或写成：标题 | 链接 | 价格 | 销量 | 店铺名称 | 店铺粉丝数 | 店铺累计销量"></textarea>
+            <div class="form-foot" style="margin-top:10px">
+              <p class="hint">支持 CSV / Excel。表头尽量包含：关键词、商品标题、商品链接、价格、商品销量、店铺名称、店铺粉丝数、店铺累计销量。</p>
+              <button id="pd-import-btn" class="btn btn-ghost" type="button">导入表格</button>
+              <input id="pd-import-file" class="file-input" type="file" accept=".csv,.tsv,.txt,.xlsx,.xls">
+            </div>
+            <p class="field-error" id="pd-error" hidden></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card form-card" id="pd-result-card">
+        <div class="sec-head">
+          <div>
+            <h3>采集结果</h3>
+            <p class="note" id="pd-result-note" style="margin-top:3px">尚未采集</p>
+          </div>
+          <button id="pd-download" class="btn btn-primary btn-sm" type="button">下载全部</button>
+        </div>
+
+        <div class="table-wrap">
+          <div class="table-scroll">
+            <table class="data" id="pd-table">
+              <colgroup>
+                <col style="width:7%">
+                <col style="width:18%">
+                <col style="width:12%">
+                <col style="width:5%">
+                <col style="width:6%">
+                <col style="width:9%">
+                <col style="width:7%">
+                <col style="width:8%">
+                <col style="width:7%">
+                <col style="width:7%">
+                <col style="width:9%">
+                <col style="width:5%">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th scope="col">关键词</th>
+                  <th scope="col">商品标题</th>
+                  <th scope="col">商品链接</th>
+                  <th scope="col">价格</th>
+                  <th scope="col">商品销量</th>
+                  <th scope="col">店铺名称</th>
+                  <th scope="col">店铺粉丝数</th>
+                  <th scope="col">店铺累计销量</th>
+                  <th scope="col">店铺粉销比</th>
+                  <th scope="col">采集状态</th>
+                  <th scope="col">失败原因</th>
+                  <th scope="col">查看</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="summary" id="pd-summary">
+            <div class="figs">
+              <span>关键词 <b id="pd-sum-kw">0</b></span>
+              <span>成功商品 <b id="pd-sum-ok">0</b></span>
+              <span class="warn">失败行 <b id="pd-sum-fail">0</b></span>
+            </div>
+            <div id="pd-kw-downloads" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     视图：设置（API 密钥占位）
+     ============================================================ -->
+<section class="view view-settings" aria-label="设置">
+  <div class="card settings-card">
+    <h1>设置</h1>
+    <p class="lead">密钥只留在本机浏览器（localStorage），不会写入代码，也不会上传到本工作台以外的服务器。调用接口时由本地代理临时转发，代理不落盘保存密钥。</p>
+
+    <div class="field-row" style="margin-top:22px">
+      <div class="field-label">模型服务 API 密钥</div>
+      <input id="set-apikey" class="field field-one" type="password" autocomplete="off" placeholder="火山引擎方舟 ARK API Key，形如 AKLT… 或 sk-…">
+      <p class="field-note">到 <a href="https://console.volcengine.com/ark/region:ark+cn-beijing/apiKey" target="_blank" rel="noopener">方舟控制台 · API Key 管理</a> 自行创建。新用户通常每个模型有免费 Tokens / 生图额度，用完后请不要在本工具里自行开通付费。同一把钥匙同时用于改写（文本/多模态）和 Seedream 生图。</p>
+    </div>
+
+    <div class="field-row">
+      <div class="field-label">文本模型 ID</div>
+      <input id="set-text-model" class="field field-one" type="text" placeholder="doubao-seed-2-1-lite-260915">
+      <p class="field-note">默认使用豆包 Seed 2.1 lite（多模态，可看图改写）。也可填控制台开通的 Model ID 或推理接入点 ep-…。优先消耗免费额度。</p>
+    </div>
+
+    <div class="field-row">
+      <div class="field-label">生图模型 ID</div>
+      <input id="set-image-model" class="field field-one" type="text" placeholder="doubao-seedream-5-0-pro-260628">
+      <p class="field-note">默认 Seedream 5.0 pro（完整 ID doubao-seedream-5-0-pro-260628，支持 1K / 2K）。若改用 Seedream 5.0 pro / flash，4K 会自动降到 2K。</p>
+    </div>
+
+    <div class="field-row">
+      <div class="field-label">接口地址（可选）</div>
+      <input id="set-base-url" class="field field-one" type="text" placeholder="https://ark.cn-beijing.volces.com/api/v3">
+      <p class="field-note">一般不用改。文档：<a href="https://ark.volcengine.com/region:cn-beijing/docs/chat-api" target="_blank" rel="noopener">对话 API</a>、<a href="https://ark.volcengine.com/region:cn-beijing/docs/image-generation-api" target="_blank" rel="noopener">图片生成 API</a>。</p>
+    </div>
+
+    <div class="field-row">
+      <div class="field-label">小红书 Cookie（可选）</div>
+      <textarea id="set-cookie" class="field" style="min-height:80px" placeholder="从浏览器里复制出来的小红书 Cookie 字符串，只用于尝试解析你自己的笔记/视频链接。"></textarea>
+      <p class="field-note">仅保存在本机浏览器 localStorage，不写进代码、不进日志、不上传。未配置时，小红书链接不会发起请求，可改用上传视频/音频文件转写。</p>
+    </div>
+
+    <div class="field-row">
+      <div class="field-label">抖音 Cookie（可选）</div>
+      <textarea id="set-douyin-cookie" class="field" style="min-height:80px" placeholder="从浏览器里复制出来的抖音 Cookie 字符串，只用于尝试解析你自己的视频链接。"></textarea>
+      <p class="field-note">仅保存在本机浏览器 localStorage。未配置时，抖音链接不会发起请求。小红书与 B站不受这一栏影响。</p>
+    </div>
+
+    <div class="field-row">
+      <div class="field-label">微博 Cookie（可选）</div>
+      <textarea id="set-weibo-cookie" class="field" style="min-height:80px" placeholder="从浏览器里复制出来的微博 Cookie 字符串，只用于尝试解析你自己的微博链接。"></textarea>
+      <p class="field-note">仅保存在本机浏览器 localStorage。未配置时，微博链接不会发起请求。B站走公开接口，不需要任何 Cookie。</p>
+    </div>
+
+    <div class="form-foot">
+      <p class="hint" id="set-hint">保存后立即生效，只写进本机 localStorage。</p>
+      <button id="set-save" class="btn btn-primary" type="button">保存设置</button>
+    </div>
+
+    <p class="settings-note">打开本页即可使用全部本地功能（切页、校验、模板、列表、导出）。调用豆包改写/生图时，请先用 <code>python3 server.py</code> 启动本地代理，再在浏览器打开提示的地址，避免 file:// 被跨域拦截。</p>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-foot">
+  <div class="inner">AI 内容工作台 · WEB-001 · 本地使用，密钥只留在本机</div>
+</footer>
+
+
+<div class="modal-root is-hidden" id="modal-root">
+  <div class="modal" role="dialog" aria-modal="true" id="modal">
+    <div class="modal-head">
+      <h3 id="modal-title">提示</h3>
+      <button class="btn btn-quiet" type="button" id="modal-close" aria-label="关闭">×</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-actions" id="modal-actions"></div>
+  </div>
+</div>
+<div class="lightbox is-hidden" id="lightbox">
+  <button type="button" class="lightbox-close" id="lightbox-close" aria-label="关闭">×</button>
+  <img id="lightbox-img" alt="大图">
+</div>
+<script src="assets/app.js"></script>
+</body>
+</html>
